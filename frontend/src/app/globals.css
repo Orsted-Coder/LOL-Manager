@@ -1,0 +1,56 @@
+/* Tailwind CSS directives - bắt buộc phải có để Tailwind hoạt động */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import font Cinzel từ Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ===== BASE STYLES ===== */
+:root {
+  --lol-dark: #0a0e1a;
+  --lol-panel: #111827;
+  --lol-border: #1e2d40;
+  --lol-gold: #c89b3c;
+  --lol-gold-light: #f0e6d3;
+  --lol-blue: #0bc4e3;
+  --lol-red: #e84057;
+}
+
+/* Nền tối toàn trang */
+body {
+  background-color: var(--lol-dark);
+  color: var(--lol-gold-light);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* Scrollbar tùy chỉnh */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--lol-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--lol-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lol-gold);
+}
+
+/* Hiệu ứng glow cho card khi hover */
+.card-hover {
+  transition: all 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(200, 155, 60, 0.2);
+}
+
+/* Progress bar style */
+.stat-bar-fill {
+  transition: width 0.5s ease;
+}
