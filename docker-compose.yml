@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Database PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: lol_manager_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lol_manager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend NestJS (tuỳ chọn - có thể chạy local)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lol_manager_backend
+    ports:
+      - "3001:3001"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: lol_manager
+      PORT: 3001
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - full  # Chỉ chạy khi: docker compose --profile full up
+
+  # Frontend Next.js (tuỳ chọn)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lol_manager_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+    depends_on:
+      - backend
+    profiles:
+      - full
+
+volumes:
+  postgres_data:
