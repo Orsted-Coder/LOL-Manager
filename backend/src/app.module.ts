@@ -6,6 +6,7 @@ import { PlayerModule } from './player/player.module';
 import { ItemModule } from './item/item.module';
 import { TeamModule } from './team/team.module';
 import { SeedModule } from './seed/seed.module';
+import { MatchModule } from './match/match.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SeedModule } from './seed/seed.module';
     ItemModule,
     TeamModule,
     SeedModule,
+    MatchModule,
   ],
 })
 export class AppModule {}

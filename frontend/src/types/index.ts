@@ -137,3 +137,51 @@ export interface Team {
   createdAt: string;
   updatedAt: string;
 }
+
+// ===== TRẬN ĐẤU (Match) =====
+export type MatchFormat = 'bo1' | 'bo3' | 'bo5';
+
+export type MatchEventType =
+  | 'FIRST_BLOOD'
+  | 'DRAGON'
+  | 'BARON'
+  | 'TOWER'
+  | 'INHIBITOR'
+  | 'NEXUS'
+  | 'KILL';
+
+export interface MatchEvent {
+  time: number;
+  type: MatchEventType;
+  teamSide: 1 | 2;
+  playerName?: string;
+  description: string;
+}
+
+export interface GameLog {
+  gameNumber: number;
+  winningSide: 1 | 2;
+  duration: number;
+  team1Kills: number;
+  team2Kills: number;
+  team1PowerScore: number;
+  team2PowerScore: number;
+  events: MatchEvent[];
+}
+
+export interface Match {
+  id: number;
+  team1Id: number;
+  team1: Team;
+  team2Id: number;
+  team2: Team;
+  winnerId: number;
+  winner: Team;
+  format: MatchFormat;
+  team1Score: number;
+  team2Score: number;
+  team1Power: number;
+  team2Power: number;
+  matchLog: GameLog[];
+  createdAt: string;
+}
