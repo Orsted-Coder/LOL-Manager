@@ -204,7 +204,7 @@ export class MatchService {
     const losingPlayers = winningSide === 1 ? team2Players : team1Players;
     const winningTeamName = winningSide === 1 ? team1.name : team2.name;
     const losingTeamName = winningSide === 1 ? team2.name : team1.name;
-    const loosingSide: 1 | 2 = winningSide === 1 ? 2 : 1;
+    const losingSide: 1 | 2 = winningSide === 1 ? 2 : 1;
 
     const pickWin = () => this.randElement(winningPlayers);
     const pickLose = () => this.randElement(losingPlayers);
@@ -235,7 +235,7 @@ export class MatchService {
     // First Blood (5–8 min) — đội mạnh hơn có 65% khả năng lấy
     {
       const time = this.rand(5, 8);
-      const side = Math.random() < 0.65 ? winningSide : loosingSide;
+      const side = Math.random() < 0.65 ? winningSide : losingSide;
       const player = side === winningSide ? pickWin() : pickLose();
       const teamName = side === 1 ? team1.name : team2.name;
       events.push({
@@ -250,14 +250,14 @@ export class MatchService {
     // Kills sớm (6–14 min): đội thắng lấy ~60%
     const earlyKillCount = this.rand(3, 6);
     for (let i = 0; i < earlyKillCount; i++) {
-      const side = Math.random() < 0.60 ? winningSide : loosingSide;
+      const side = Math.random() < 0.60 ? winningSide : losingSide;
       addKill(this.rand(6, 14), side);
     }
 
     // Dragon lần 1 (8–12 min)
     {
       const time = this.rand(8, 12);
-      const side = Math.random() < 0.65 ? winningSide : loosingSide;
+      const side = Math.random() < 0.65 ? winningSide : losingSide;
       const jungler = side === winningSide ? winJg : loseJg;
       const teamName = side === 1 ? team1.name : team2.name;
       events.push({
@@ -272,7 +272,7 @@ export class MatchService {
     // Tháp đầu tiên (10–14 min)
     {
       const time = this.rand(10, 14);
-      const side = Math.random() < 0.65 ? winningSide : loosingSide;
+      const side = Math.random() < 0.65 ? winningSide : losingSide;
       const teamName = side === 1 ? team1.name : team2.name;
       events.push({
         time,
@@ -287,14 +287,14 @@ export class MatchService {
     // Kills giữa trận (14–24 min): đội thắng lấy ~62%
     const midKillCount = this.rand(4, 8);
     for (let i = 0; i < midKillCount; i++) {
-      const side = Math.random() < 0.62 ? winningSide : loosingSide;
+      const side = Math.random() < 0.62 ? winningSide : losingSide;
       addKill(this.rand(14, 24), side);
     }
 
     // Dragon lần 2 (13–18 min)
     {
       const time = this.rand(13, 18);
-      const side = Math.random() < 0.65 ? winningSide : loosingSide;
+      const side = Math.random() < 0.65 ? winningSide : losingSide;
       const jungler = side === winningSide ? winJg : loseJg;
       const teamName = side === 1 ? team1.name : team2.name;
       events.push({
@@ -310,7 +310,7 @@ export class MatchService {
     const midTowerCount = this.rand(1, 3);
     for (let i = 0; i < midTowerCount; i++) {
       const time = this.rand(14, 24);
-      const side = Math.random() < 0.65 ? winningSide : loosingSide;
+      const side = Math.random() < 0.65 ? winningSide : losingSide;
       const teamName = side === 1 ? team1.name : team2.name;
       events.push({
         time,
@@ -323,7 +323,7 @@ export class MatchService {
     // Baron Nashor (nếu trận kéo dài ≥25 min)
     if (duration >= 25) {
       const time = this.rand(20, Math.min(28, duration - 5));
-      const side = Math.random() < 0.72 ? winningSide : loosingSide;
+      const side = Math.random() < 0.72 ? winningSide : losingSide;
       const jungler = side === winningSide ? winJg : loseJg;
       const teamName = side === 1 ? team1.name : team2.name;
       events.push({
@@ -340,7 +340,7 @@ export class MatchService {
     if (duration > 30) {
       const lateKillCount = this.rand(5, 10);
       for (let i = 0; i < lateKillCount; i++) {
-        const side = Math.random() < 0.65 ? winningSide : loosingSide;
+        const side = Math.random() < 0.65 ? winningSide : losingSide;
         addKill(this.rand(25, duration - 3), side);
       }
 

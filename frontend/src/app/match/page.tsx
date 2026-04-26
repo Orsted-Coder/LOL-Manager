@@ -504,7 +504,7 @@ function EventRow({
       `}
     >
       {/* Thời gian */}
-      <span className="text-gray-600 w-8 shrink-0 text-right">{event.time}&apos;</span>
+      <span className="text-gray-600 w-8 shrink-0 text-right">{event.time}'</span>
       {/* Icon */}
       <span className={`${cfg.color} shrink-0`}>{cfg.icon}</span>
       {/* Mô tả */}
