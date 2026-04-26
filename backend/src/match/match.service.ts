@@ -81,7 +81,12 @@ export class MatchService {
       matchLog: matchLogs,
     });
 
-    return this.matchRepo.save(match);
+    const saved = await this.matchRepo.save(match);
+    // Populate relations so the returned object is complete
+    saved.team1 = team1;
+    saved.team2 = team2;
+    saved.winner = team1Score > team2Score ? team1 : team2;
+    return saved;
   }
 
   // ===== MATCH ENGINE =====
