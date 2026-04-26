@@ -1,4 +1,4 @@
-import { Champion, Player, Item, Team, Match, Tournament } from '@/types';
+import { Champion, Player, Item, Team, Match, Tournament, TransferMarket, TransferOffer, TeamOffers } from '@/types';
 
 // Cấu hình API - URL của backend NestJS
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -92,3 +92,39 @@ export const swrFetcher = (url: string) =>
     if (!res.ok) throw new Error('Network response was not ok');
     return res.json();
   });
+
+// Transfer Market - Phase 4
+export const transferApi = {
+  getMarket: () => fetchApi<TransferMarket>('/transfer/market'),
+  getOffersByTeam: (teamId: number) =>
+    fetchApi<TeamOffers>(`/transfer/offers?teamId=${teamId}`),
+  listPlayer: (playerId: number, transferFee: number) =>
+    fetchApi<Player>('/transfer/list', {
+      method: 'POST',
+      body: JSON.stringify({ playerId, transferFee }),
+    }),
+  unlistPlayer: (playerId: number) =>
+    fetchApi<Player>('/transfer/unlist', {
+      method: 'POST',
+      body: JSON.stringify({ playerId }),
+    }),
+  signFreeAgent: (teamId: number, playerId: number) =>
+    fetchApi<Player>('/transfer/sign', {
+      method: 'POST',
+      body: JSON.stringify({ teamId, playerId }),
+    }),
+  releasePlayer: (teamId: number, playerId: number) =>
+    fetchApi<Player>('/transfer/release', {
+      method: 'POST',
+      body: JSON.stringify({ teamId, playerId }),
+    }),
+  makeOffer: (fromTeamId: number, playerId: number, amount: number) =>
+    fetchApi<TransferOffer>('/transfer/offer', {
+      method: 'POST',
+      body: JSON.stringify({ fromTeamId, playerId, amount }),
+    }),
+  acceptOffer: (offerId: number) =>
+    fetchApi<TransferOffer>(`/transfer/offers/${offerId}/accept`, { method: 'POST' }),
+  rejectOffer: (offerId: number) =>
+    fetchApi<TransferOffer>(`/transfer/offers/${offerId}/reject`, { method: 'POST' }),
+};

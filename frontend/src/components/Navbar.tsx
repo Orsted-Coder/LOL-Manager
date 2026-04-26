@@ -11,6 +11,7 @@ const navItems = [
   { href: '/roster', label: '⚔️ Đội Hình', title: 'Quản lý tuyển thủ' },
   { href: '/match', label: '🎮 Trận Đấu', title: 'Mô phỏng trận đấu' },
   { href: '/tournament', label: '🏆 Giải Đấu', title: 'Hệ thống giải đấu' },
+  { href: '/transfer', label: '🔄 Chuyển Nhượng', title: 'Thị trường chuyển nhượng' },
   { href: '/champions', label: '🐉 Tướng', title: 'Danh sách tướng' },
   { href: '/items', label: '🗡️ Trang Bị', title: 'Danh sách trang bị' },
 ];
