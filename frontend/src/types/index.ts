@@ -185,3 +185,43 @@ export interface Match {
   matchLog: GameLog[];
   createdAt: string;
 }
+
+// ===== GIẢI ĐẤU (Tournament) - Phase 3 =====
+export type TournamentStatus = 'pending' | 'ongoing' | 'completed';
+
+export interface TournamentMatch {
+  round: number;
+  team1Id: number;
+  team1Name: string;
+  team2Id: number;
+  team2Name: string;
+  matchId?: number;
+  winnerId?: number;
+  winnerName?: string;
+  team1Score?: number;
+  team2Score?: number;
+  status: 'pending' | 'completed';
+}
+
+export interface TournamentStanding {
+  teamId: number;
+  teamName: string;
+  primaryColor: string;
+  secondaryColor: string;
+  wins: number;
+  losses: number;
+  points: number;
+}
+
+export interface Tournament {
+  id: number;
+  name: string;
+  status: TournamentStatus;
+  matchFormat: MatchFormat;
+  teams: Team[];
+  schedule: TournamentMatch[];
+  standings: TournamentStanding[];
+  winnerId: number | null;
+  createdAt: string;
+  updatedAt: string;
+}

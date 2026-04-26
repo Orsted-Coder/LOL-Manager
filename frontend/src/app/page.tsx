@@ -1,18 +1,11 @@
 'use client';
 // Dashboard - Màn hình chính của game
-// Hiển thị: tổng quan đội, lịch thi đấu giả, thống kê
+// Hiển thị: tổng quan đội, lịch thi đấu, thống kê
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { teamApi, playerApi, seedApi } from '@/lib/api';
-import { Team, Player } from '@/types';
-
-// Dữ liệu lịch thi đấu giả (Phase 1 - sẽ có API thật ở Phase 3)
-const mockSchedule = [
-  { id: 1, homeTeam: 'GAM Esports', awayTeam: 'Team Flash', date: '20/04/2025', time: '18:00', status: 'upcoming' },
-  { id: 2, homeTeam: 'Saigon Buffalo', awayTeam: 'GAM Esports', date: '22/04/2025', time: '19:00', status: 'upcoming' },
-  { id: 3, homeTeam: 'Team Flash', awayTeam: 'Saigon Buffalo', date: '24/04/2025', time: '20:00', status: 'upcoming' },
-];
+import { teamApi, playerApi, seedApi, tournamentApi } from '@/lib/api';
+import { Team, Player, Tournament } from '@/types';
 
 // Dữ liệu tin tức giả
 const mockNews = [
@@ -26,6 +19,7 @@ export default function DashboardPage() {
   // State lưu dữ liệu từ API
   const [teams, setTeams] = useState<Team[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
@@ -39,13 +33,15 @@ export default function DashboardPage() {
   async function loadData() {
     try {
       setLoading(true);
-      // Gọi đồng thời cả 2 API để tối ưu thời gian chờ
-      const [teamsData, playersData] = await Promise.all([
+      // Gọi đồng thời các API để tối ưu thời gian chờ
+      const [teamsData, playersData, toursData] = await Promise.all([
         teamApi.getAll(),
         playerApi.getAll(),
+        tournamentApi.getAll(),
       ]);
       setTeams(teamsData);
       setPlayers(playersData);
+      setTournaments(toursData);
     } catch (err) {
       setError('Không thể kết nối đến server. Đảm bảo backend đang chạy tại port 3001.');
       console.error(err);
@@ -70,10 +66,10 @@ export default function DashboardPage() {
     }
   }
 
-  // Tính tổng lương của đội
-  const totalSalary = players.reduce((sum, p) => sum + (p.salary || 0), 0);
   // Tìm tuyển thủ OVR cao nhất
-  const topPlayer = players.reduce((best, p) => p.ovr > (best?.ovr || 0) ? p : best, players[0]);
+  const topPlayer = players.length
+    ? players.reduce((best, p) => p.ovr > (best?.ovr || 0) ? p : best, players[0])
+    : null;
 
   return (
     // max-w-7xl mx-auto: giới hạn chiều rộng và căn giữa
@@ -127,12 +123,7 @@ export default function DashboardPage() {
             <StatCard icon="🏟️" label="Đội tuyển" value={teams.length} color="lol-gold" />
             <StatCard icon="⚔️" label="Tuyển thủ" value={players.length} color="lol-blue" />
             <StatCard icon="⭐" label="OVR Cao nhất" value={topPlayer?.ovr || 0} color="green" />
-            <StatCard
-              icon="💰"
-              label="Tổng quỹ lương"
-              value={`$${(totalSalary / 1000).toFixed(0)}K`}
-              color="yellow"
-            />
+            <StatCard icon="🏆" label="Giải Đấu" value={tournaments.length} color="yellow" />
           </div>
 
           {/* ===== LAYOUT CHÍNH: 2 cột trên desktop ===== */}
@@ -155,24 +146,52 @@ export default function DashboardPage() {
                 )}
               </Section>
 
-              {/* Lịch thi đấu */}
-              <Section title="📅 Lịch Thi Đấu Sắp Tới">
-                <div className="space-y-2">
-                  {mockSchedule.map((match) => (
-                    <div key={match.id}
-                         className="flex items-center justify-between p-3 bg-lol-border/30 rounded-lg">
-                      <div className="text-sm">
-                        <span className="text-lol-gold-light font-medium">{match.homeTeam}</span>
-                        <span className="text-gray-500 mx-2">vs</span>
-                        <span className="text-lol-gold-light font-medium">{match.awayTeam}</span>
-                      </div>
-                      <div className="text-right text-xs text-gray-400">
-                        <div>{match.date}</div>
-                        <div>{match.time}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              {/* Giải đấu đang diễn ra */}
+              <Section
+                title="📅 Giải Đấu"
+                action={<Link href="/tournament" className="text-xs text-lol-blue hover:underline">Xem tất cả →</Link>}
+              >
+                {tournaments.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500 text-sm mb-3">Chưa có giải đấu nào.</p>
+                    <Link
+                      href="/tournament"
+                      className="text-xs text-lol-gold border border-lol-gold/40 px-3 py-1.5 rounded-md hover:bg-lol-gold/10 transition-colors"
+                    >
+                      🏆 Tạo giải đấu đầu tiên
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {tournaments.slice(0, 3).map((t) => {
+                      const completed = t.schedule.filter((m) => m.status === 'completed').length;
+                      const total = t.schedule.length;
+                      const leader = t.standings[0];
+                      return (
+                        <Link
+                          key={t.id}
+                          href="/tournament"
+                          className="flex items-center justify-between p-3 bg-lol-border/30 rounded-lg hover:bg-lol-border/50 transition-colors"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-lol-gold-light">{t.name}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {t.matchFormat.toUpperCase()} • {completed}/{total} trận
+                              {leader ? ` • Dẫn đầu: ${leader.teamName}` : ''}
+                            </p>
+                          </div>
+                          <span className={`text-xs font-medium ${
+                            t.status === 'completed' ? 'text-lol-gold' :
+                            t.status === 'ongoing' ? 'text-yellow-400' : 'text-gray-400'
+                          }`}>
+                            {t.status === 'completed' ? '✅ Kết thúc' :
+                             t.status === 'ongoing' ? '🔴 Đang diễn ra' : '⏳ Chờ'}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </Section>
             </div>
 

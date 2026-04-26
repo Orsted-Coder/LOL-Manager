@@ -1,4 +1,4 @@
-import { Champion, Player, Item, Team, Match } from '@/types';
+import { Champion, Player, Item, Team, Match, Tournament } from '@/types';
 
 // Cấu hình API - URL của backend NestJS
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -67,6 +67,23 @@ export const matchApi = {
       method: 'POST',
       body: JSON.stringify({ team1Id, team2Id, format }),
     }),
+};
+
+// Tournaments
+export const tournamentApi = {
+  getAll: () => fetchApi<Tournament[]>('/tournaments'),
+  getOne: (id: number) => fetchApi<Tournament>(`/tournaments/${id}`),
+  create: (name: string, teamIds: number[], matchFormat: 'bo1' | 'bo3' | 'bo5' = 'bo1') =>
+    fetchApi<Tournament>('/tournaments', {
+      method: 'POST',
+      body: JSON.stringify({ name, teamIds, matchFormat }),
+    }),
+  simulateNext: (id: number) =>
+    fetchApi<Tournament>(`/tournaments/${id}/simulate-next`, { method: 'POST' }),
+  simulateAll: (id: number) =>
+    fetchApi<Tournament>(`/tournaments/${id}/simulate-all`, { method: 'POST' }),
+  remove: (id: number) =>
+    fetchApi<void>(`/tournaments/${id}`, { method: 'DELETE' }),
 };
 
 // SWR fetcher - hàm dùng với thư viện SWR để tự động cache và refetch
