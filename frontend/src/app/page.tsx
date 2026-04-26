@@ -67,7 +67,9 @@ export default function DashboardPage() {
   }
 
   // Tìm tuyển thủ OVR cao nhất
-  const topPlayer = players.reduce((best, p) => p.ovr > (best?.ovr || 0) ? p : best, players[0]);
+  const topPlayer = players.length
+    ? players.reduce((best, p) => p.ovr > (best?.ovr || 0) ? p : best, players[0])
+    : null;
 
   return (
     // max-w-7xl mx-auto: giới hạn chiều rộng và căn giữa

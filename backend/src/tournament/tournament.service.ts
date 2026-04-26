@@ -128,7 +128,7 @@ export class TournamentService {
     }
 
     // Sắp xếp bảng xếp hạng theo điểm giảm dần
-    tournament.standings.sort((a, b) => b.points - a.points || b.wins - a.wins);
+    this.sortStandings(tournament.standings);
 
     // Xác định trạng thái và đội vô địch
     const allDone = tournament.schedule.every((m) => m.status === 'completed');
@@ -173,7 +173,7 @@ export class TournamentService {
 
     this.updateStandings(tournament.standings, nextMatch);
 
-    tournament.standings.sort((a, b) => b.points - a.points || b.wins - a.wins);
+    this.sortStandings(tournament.standings);
 
     const allDone = tournament.schedule.every((m) => m.status === 'completed');
     if (allDone) {
@@ -189,6 +189,11 @@ export class TournamentService {
   async remove(id: number): Promise<void> {
     const tournament = await this.findOne(id);
     await this.tournamentRepo.remove(tournament);
+  }
+
+  // Sắp xếp bảng xếp hạng: điểm cao → số thắng cao
+  private sortStandings(standings: TournamentStanding[]): void {
+    standings.sort((a, b) => b.points - a.points || b.wins - a.wins);
   }
 
   // Cập nhật bảng xếp hạng dựa trên kết quả một trận
