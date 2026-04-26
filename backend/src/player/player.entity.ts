@@ -159,6 +159,20 @@ export class Player {
   @Column({ type: 'int', default: 60000 })
   salary: number;
 
+  // ===== PHASE 4: TRANSFER MARKET =====
+
+  // Có đang được rao bán trên thị trường không
+  @Column({ name: 'is_transfer_listed', type: 'boolean', default: false })
+  isTransferListed: boolean;
+
+  // Phí chuyển nhượng yêu cầu (USD)
+  @Column({ name: 'transfer_fee', type: 'int', default: 0 })
+  transferFee: number;
+
+  // Mùa giải hết hạn hợp đồng (0 = tự do)
+  @Column({ name: 'contract_end_season', type: 'int', default: 2 })
+  contractEndSeason: number;
+
   // Quan hệ nhiều-một với Team (nhiều tuyển thủ thuộc một đội)
   @ManyToOne(() => Team, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'team_id' })

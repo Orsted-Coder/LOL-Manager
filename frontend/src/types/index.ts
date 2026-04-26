@@ -92,6 +92,10 @@ export interface Player {
   professionalism: number;
   loyalty: number;
   salary: number;
+  // Phase 4: Transfer Market
+  isTransferListed: boolean;
+  transferFee: number;
+  contractEndSeason: number;
   teamId: number | null;
   team: Team | null;
   createdAt: string;
@@ -224,4 +228,31 @@ export interface Tournament {
   winnerId: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+// ===== CHUYỂN NHƯỢNG (Transfer) - Phase 4 =====
+export type OfferStatus = 'pending' | 'accepted' | 'rejected';
+
+export interface TransferOffer {
+  id: number;
+  fromTeamId: number;
+  fromTeam: Team;
+  toTeamId: number | null;
+  toTeam: Team | null;
+  playerId: number;
+  player: Player;
+  amount: number;
+  status: OfferStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TransferMarket {
+  freeAgents: Player[];
+  listedPlayers: Player[];
+}
+
+export interface TeamOffers {
+  incoming: TransferOffer[];
+  outgoing: TransferOffer[];
 }

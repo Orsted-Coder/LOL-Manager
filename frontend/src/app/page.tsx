@@ -125,7 +125,6 @@ export default function DashboardPage() {
             <StatCard icon="⭐" label="OVR Cao nhất" value={topPlayer?.ovr || 0} color="green" />
             <StatCard icon="🏆" label="Giải Đấu" value={tournaments.length} color="yellow" />
           </div>
-
           {/* ===== LAYOUT CHÍNH: 2 cột trên desktop ===== */}
           {/* grid-cols-1: 1 cột trên mobile | lg:grid-cols-3: 3 cột trên màn lớn */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -210,6 +209,32 @@ export default function DashboardPage() {
                     </div>
                   ))}
                 </div>
+              </Section>
+
+              {/* Thị trường chuyển nhượng */}
+              <Section title="🔄 Chuyển Nhượng" action={<Link href="/transfer" className="text-xs text-lol-blue hover:underline">Xem thị trường →</Link>}>
+                {(() => {
+                  const freeAgents = players.filter((p) => !p.teamId);
+                  const listed = players.filter((p) => p.isTransferListed);
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">🆓 Tuyển thủ tự do</span>
+                        <span className="text-green-400 font-medium">{freeAgents.length}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">🏷️ Đang rao bán</span>
+                        <span className="text-yellow-400 font-medium">{listed.length}</span>
+                      </div>
+                      <Link
+                        href="/transfer"
+                        className="block mt-3 text-center text-xs text-lol-gold border border-lol-gold/40 px-3 py-1.5 rounded-md hover:bg-lol-gold/10 transition-colors"
+                      >
+                        🔄 Vào thị trường chuyển nhượng
+                      </Link>
+                    </div>
+                  );
+                })()}
               </Section>
 
               {/* Top tuyển thủ */}

@@ -12,16 +12,22 @@ LOL-Manager/
 │       ├── player/   # Tuyển thủ: entity, service, controller, module
 │       ├── item/     # Trang bị: entity, service, controller, module
 │       ├── team/     # Đội tuyển: entity, service, controller, module
+│       ├── match/    # Trận đấu: entity, service, controller, module
+│       ├── tournament/ # Giải đấu: entity, service, controller, module
+│       ├── transfer/ # Chuyển nhượng: entity, service, controller, module
 │       ├── seed/     # Seeder: tạo dữ liệu mẫu
 │       ├── app.module.ts
 │       └── main.ts
 ├── frontend/         # Next.js Web App (Port 3000)
 │   └── src/
 │       ├── app/      # App Router (Next.js 14)
-│       │   ├── page.tsx           # Dashboard (màn hình chính)
-│       │   ├── roster/page.tsx    # Quản lý đội hình
-│       │   ├── champions/page.tsx # Danh sách tướng
-│       │   └── items/page.tsx     # Danh sách trang bị
+│       │   ├── page.tsx              # Dashboard (màn hình chính)
+│       │   ├── roster/page.tsx       # Quản lý đội hình
+│       │   ├── match/page.tsx        # Mô phỏng trận đấu
+│       │   ├── tournament/page.tsx   # Hệ thống giải đấu
+│       │   ├── transfer/page.tsx     # Thị trường chuyển nhượng
+│       │   ├── champions/page.tsx    # Danh sách tướng
+│       │   └── items/page.tsx        # Danh sách trang bị
 │       ├── components/  # React components tái sử dụng
 │       ├── lib/api.ts   # Hàm gọi API đến Backend
 │       └── types/       # TypeScript types
@@ -68,6 +74,6 @@ Frontend chạy tại: http://localhost:3000
 - Phase 1: Database Schema, API CRUD, Seeder, Frontend Dashboard & Đội Hình
 - Phase 2: Match Engine (mô phỏng trận đấu 5v5)
 - Phase 3: Hệ thống giải đấu, lịch thi đấu
-- Phase 4: Thị trường chuyển nhượng, hợp đồng
+- Phase 4: Thị trường chuyển nhượng, hợp đồng ✅
 - Phase 5: Tối ưu hóa, caching Redis, hoàn thiện UI/UX
 - Phase 6: Dữ liệu đầy đủ và kiểm thử Alpha

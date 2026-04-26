@@ -8,6 +8,7 @@ import { TeamModule } from './team/team.module';
 import { SeedModule } from './seed/seed.module';
 import { MatchModule } from './match/match.module';
 import { TournamentModule } from './tournament/tournament.module';
+import { TransferModule } from './transfer/transfer.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { TournamentModule } from './tournament/tournament.module';
     SeedModule,
     MatchModule,
     TournamentModule,
+    TransferModule,
   ],
 })
 export class AppModule {}
