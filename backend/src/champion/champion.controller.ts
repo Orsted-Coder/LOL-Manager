@@ -7,7 +7,9 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ChampionService } from './champion.service';
 import { CreateChampionDto, UpdateChampionDto } from './champion.dto';
 
@@ -16,13 +18,17 @@ import { CreateChampionDto, UpdateChampionDto } from './champion.dto';
 export class ChampionController {
   constructor(private readonly championService: ChampionService) {}
 
-  // GET /api/champions - Lấy danh sách tất cả tướng
+  // GET /api/champions - Lấy danh sách tất cả tướng (cache 30 phút)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30 * 60 * 1000)
   @Get()
   findAll() {
     return this.championService.findAll();
   }
 
-  // GET /api/champions/:id - Lấy thông tin 1 tướng
+  // GET /api/champions/:id - Lấy thông tin 1 tướng (cache 30 phút)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30 * 60 * 1000)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.championService.findOne(id);

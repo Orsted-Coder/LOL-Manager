@@ -7,7 +7,9 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ItemService } from './item.service';
 import { CreateItemDto, UpdateItemDto } from './item.dto';
 
@@ -15,11 +17,17 @@ import { CreateItemDto, UpdateItemDto } from './item.dto';
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
+  // GET /api/items - Lấy tất cả trang bị (cache 30 phút)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30 * 60 * 1000)
   @Get()
   findAll() {
     return this.itemService.findAll();
   }
 
+  // GET /api/items/:id - Lấy 1 trang bị (cache 30 phút)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30 * 60 * 1000)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.itemService.findOne(id);

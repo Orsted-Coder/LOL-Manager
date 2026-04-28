@@ -6,6 +6,7 @@ import { championApi } from '@/lib/api';
 import { Champion, DamageType } from '@/types';
 import ChampionCard from '@/components/ChampionCard';
 import StatBar from '@/components/StatBar';
+import { ChampionCardSkeleton } from '@/components/SkeletonLoader';
 
 const damageTypes: DamageType[] = ['Physical', 'Magic', 'Mixed'];
 const damageLabels: Record<DamageType, string> = {
@@ -51,8 +52,8 @@ export default function ChampionsPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-lol-gold animate-pulse">⚡ Đang tải tướng...</div>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 9 }).map((_, i) => <ChampionCardSkeleton key={i} />)}
         </div>
       ) : (
         <>

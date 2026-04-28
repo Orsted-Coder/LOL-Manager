@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
 import { ChampionModule } from './champion/champion.module';
 import { PlayerModule } from './player/player.module';
 import { ItemModule } from './item/item.module';
@@ -14,6 +15,28 @@ import { TransferModule } from './transfer/transfer.module';
   imports: [
     // Tải biến môi trường từ file .env
     ConfigModule.forRoot({ isGlobal: true }),
+
+    // Cache toàn cục: Redis nếu có REDIS_HOST, ngược lại dùng in-memory
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => {
+        const ttl = 5 * 60 * 1000; // 5 phút (milliseconds)
+        const redisHost = process.env.REDIS_HOST;
+        if (redisHost) {
+          const { redisStore } = await import('cache-manager-redis-yet');
+          const store = await redisStore({
+            socket: {
+              host: redisHost,
+              port: parseInt(process.env.REDIS_PORT || '6379'),
+            },
+            ttl,
+          });
+          return { store, ttl };
+        }
+        // Fallback: in-memory cache
+        return { ttl };
+      },
+    }),
 
     // Kết nối PostgreSQL qua TypeORM
     TypeOrmModule.forRoot({

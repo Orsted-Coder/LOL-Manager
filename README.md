@@ -36,10 +36,14 @@ LOL-Manager/
 
 ## Hướng Dẫn Cài Đặt & Chạy
 
-### Bước 1: Khởi động PostgreSQL
+### Bước 1: Khởi động PostgreSQL (và Redis nếu muốn caching)
 
 ```bash
+# Chỉ PostgreSQL
 docker compose up postgres -d
+
+# PostgreSQL + Redis (khuyến nghị)
+docker compose up postgres redis -d
 ```
 
 ### Bước 2: Chạy Backend (NestJS)
@@ -51,6 +55,8 @@ npm run start:dev
 ```
 
 Backend chạy tại: http://localhost:3001/api
+
+> **Lưu ý caching:** Nếu Redis đang chạy, backend sẽ tự động kết nối và cache các endpoint đọc (champions, items, teams, players). Không cần thêm cấu hình — backend tự nhận biết qua biến môi trường `REDIS_HOST`.
 
 ### Bước 3: Tạo Dữ Liệu Mẫu
 
@@ -74,6 +80,6 @@ Frontend chạy tại: http://localhost:3000
 - Phase 1: Database Schema, API CRUD, Seeder, Frontend Dashboard & Đội Hình
 - Phase 2: Match Engine (mô phỏng trận đấu 5v5)
 - Phase 3: Hệ thống giải đấu, lịch thi đấu
-- Phase 4: Thị trường chuyển nhượng, hợp đồng ✅
-- Phase 5: Tối ưu hóa, caching Redis, hoàn thiện UI/UX
+- Phase 4: Thị trường chuyển nhượng, hợp đồng
+- Phase 5: Tối ưu hóa, caching Redis, hoàn thiện UI/UX ✅
 - Phase 6: Dữ liệu đầy đủ và kiểm thử Alpha

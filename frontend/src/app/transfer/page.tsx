@@ -5,6 +5,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { teamApi, playerApi, transferApi } from '@/lib/api';
 import { Team, Player, PlayerRole, TransferOffer, TransferMarket, TeamOffers } from '@/types';
+import { useToast } from '@/components/Toast';
+import { TransferCardSkeleton } from '@/components/SkeletonLoader';
 
 // ===== CONFIG =====
 const roleLabels: Record<PlayerRole, string> = {
@@ -36,9 +38,8 @@ export default function TransferPage() {
   const [teamOffers, setTeamOffers] = useState<TeamOffers | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [actionMsg, setActionMsg] = useState('');
-  const [actionError, setActionError] = useState('');
   const [tab, setTab] = useState<Tab>('market');
+  const { showToast } = useToast();
 
   // Modal trạng thái
   const [offerModal, setOfferModal] = useState<{ player: Player; isListed: boolean } | null>(null);
@@ -93,21 +94,11 @@ export default function TransferPage() {
 
   async function handleTeamChange(id: number) {
     setMyTeamId(id);
-    setActionMsg('');
-    setActionError('');
     await loadTeamData(id);
   }
 
-  function showMsg(msg: string) {
-    setActionMsg(msg);
-    setActionError('');
-    setTimeout(() => setActionMsg(''), 4000);
-  }
-  function showErr(msg: string) {
-    setActionError(msg);
-    setActionMsg('');
-    setTimeout(() => setActionError(''), 5000);
-  }
+  function showMsg(msg: string) { showToast(msg, 'success'); }
+  function showErr(msg: string) { showToast(msg, 'error'); }
 
   async function handleSignFreeAgent(player: Player) {
     if (!myTeamId) return;
@@ -214,20 +205,13 @@ export default function TransferPage() {
           {error}
         </div>
       )}
-      {actionMsg && (
-        <div className="mb-4 p-3 bg-green-900/30 border border-green-700/50 rounded-lg text-green-300 text-sm">
-          {actionMsg}
-        </div>
-      )}
-      {actionError && (
-        <div className="mb-4 p-3 bg-red-900/30 border border-red-700/50 rounded-lg text-red-300 text-sm">
-          ❌ {actionError}
-        </div>
-      )}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-lol-gold animate-pulse">⚡ Đang tải...</div>
+        <div className="space-y-4">
+          <div className="bg-lol-panel border border-lol-border rounded-lg p-4 h-20 animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => <TransferCardSkeleton key={i} />)}
+          </div>
         </div>
       ) : (
         <>

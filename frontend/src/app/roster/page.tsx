@@ -1,12 +1,13 @@
 'use client';
 // Trang Đội Hình - Hiển thị tất cả tuyển thủ theo đội
-// Có thể lọc theo đội và vị trí
+// Có thể lọc theo đội, vị trí và tìm kiếm theo tên
 
 import { useEffect, useState } from 'react';
 import { playerApi, teamApi } from '@/lib/api';
 import { Player, PlayerRole, Team } from '@/types';
 import PlayerCard from '@/components/PlayerCard';
 import StatBar from '@/components/StatBar';
+import { PlayerCardSkeleton } from '@/components/SkeletonLoader';
 
 const roleOrder: PlayerRole[] = ['TopLane', 'Jungle', 'MidLane', 'ADC', 'Support'];
 const roleLabels: Record<PlayerRole, string> = {
@@ -26,6 +27,8 @@ export default function RosterPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   // Lọc theo vị trí (null = tất cả)
   const [selectedRole, setSelectedRole] = useState<PlayerRole | null>(null);
+  // Tìm kiếm theo tên
+  const [search, setSearch] = useState('');
   // Tuyển thủ đang xem chi tiết
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
@@ -53,6 +56,7 @@ export default function RosterPage() {
   const filteredPlayers = players.filter((p) => {
     if (selectedTeamId && p.teamId !== selectedTeamId) return false;
     if (selectedRole && p.mainRole !== selectedRole) return false;
+    if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
@@ -79,18 +83,27 @@ export default function RosterPage() {
         </div>
       )}
 
-      {/* ===== LOADING ===== */}
+      {/* ===== LOADING SKELETONS ===== */}
       {loading && (
-        <div className="flex justify-center py-20">
-          <div className="text-lol-gold animate-pulse">⚡ Đang tải tuyển thủ...</div>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 9 }).map((_, i) => <PlayerCardSkeleton key={i} />)}
         </div>
       )}
 
       {!loading && !error && (
         <>
           {/* ===== BỘ LỌC ===== */}
-          {/* flex flex-wrap gap-3: bọc xuống dòng khi không đủ chỗ */}
           <div className="flex flex-wrap gap-3 mb-6">
+            {/* Tìm kiếm theo tên */}
+            <input
+              type="text"
+              placeholder="🔍 Tìm tuyển thủ..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-lol-panel border border-lol-border rounded-md px-3 py-2 text-sm
+                         text-lol-gold-light placeholder-gray-500 focus:outline-none focus:border-lol-gold"
+            />
+
             {/* Lọc theo đội */}
             <div>
               <label className="text-xs text-gray-400 block mb-1">Đội tuyển</label>
@@ -140,6 +153,7 @@ export default function RosterPage() {
           {/* ===== SỐ KẾT QUẢ ===== */}
           <p className="text-sm text-gray-400 mb-4">
             Hiển thị {sortedPlayers.length} / {players.length} tuyển thủ
+            {search && <span className="text-lol-gold"> · tìm kiếm: "{search}"</span>}
           </p>
 
           {/* ===== LAYOUT CHÍNH ===== */}
@@ -151,6 +165,14 @@ export default function RosterPage() {
                 <div className="text-center py-20 text-gray-500">
                   <p className="text-4xl mb-3">😔</p>
                   <p>Không tìm thấy tuyển thủ phù hợp</p>
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className="mt-3 text-xs text-lol-gold hover:underline"
+                    >
+                      Xóa tìm kiếm
+                    </button>
+                  )}
                 </div>
               ) : (
                 /* grid auto-fill: tự động tính số cột dựa theo min-width */

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { teamApi, tournamentApi } from '@/lib/api';
 import { Team, Tournament, TournamentMatch } from '@/types';
+import { useToast } from '@/components/Toast';
 
 const FORMAT_OPTIONS = [
   { value: 'bo1' as const, label: 'Bo1', desc: 'Trận đơn' },
@@ -36,6 +37,7 @@ export default function TournamentPage() {
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [simulating, setSimulating] = useState(false);
   const [simError, setSimError] = useState('');
+  const { showToast } = useToast();
 
   useEffect(() => {
     Promise.all([teamApi.getAll(), tournamentApi.getAll()])
@@ -67,8 +69,10 @@ export default function TournamentPage() {
       setNewName('');
       setSelectedTeamIds([]);
       setMatchFormat('bo1');
+      showToast(`🏆 Giải đấu "${t.name}" đã được tạo!`, 'success');
     } catch (e: unknown) {
       setCreateError(e instanceof Error ? e.message : 'Lỗi không xác định');
+      showToast('Lỗi khi tạo giải đấu', 'error');
     } finally {
       setCreating(false);
     }
@@ -82,8 +86,15 @@ export default function TournamentPage() {
       const updated = await tournamentApi.simulateNext(selectedTournament.id);
       setSelectedTournament(updated);
       setTournaments((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      if (updated.status === 'completed' && updated.winnerId) {
+        const winner = updated.standings[0]?.teamName;
+        showToast(`🏆 Giải kết thúc! ${winner || 'Một đội'} vô địch!`, 'success');
+      } else {
+        showToast('Trận đấu tiếp theo hoàn thành!', 'info');
+      }
     } catch (e: unknown) {
       setSimError(e instanceof Error ? e.message : 'Lỗi không xác định');
+      showToast('Lỗi khi mô phỏng trận đấu', 'error');
     } finally {
       setSimulating(false);
     }
@@ -97,8 +108,11 @@ export default function TournamentPage() {
       const updated = await tournamentApi.simulateAll(selectedTournament.id);
       setSelectedTournament(updated);
       setTournaments((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      const winner = updated.standings[0]?.teamName;
+      showToast(`🏆 Giải kết thúc! ${winner || 'Một đội'} vô địch!`, 'success');
     } catch (e: unknown) {
       setSimError(e instanceof Error ? e.message : 'Lỗi không xác định');
+      showToast('Lỗi khi mô phỏng tất cả trận', 'error');
     } finally {
       setSimulating(false);
     }
@@ -109,15 +123,29 @@ export default function TournamentPage() {
       await tournamentApi.remove(id);
       setTournaments((prev) => prev.filter((t) => t.id !== id));
       if (selectedTournament?.id === id) setSelectedTournament(null);
+      showToast('Đã xóa giải đấu', 'info');
     } catch {
-      // ignore
+      showToast('Lỗi khi xóa giải đấu', 'error');
     }
   }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-32">
-        <div className="text-lol-gold text-xl animate-pulse">⚡ Đang tải dữ liệu...</div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-lol-gold mb-1">🏆 Hệ Thống Giải Đấu</h1>
+          <p className="text-gray-400">Tạo và quản lý giải round-robin — Phase 3 Tournament</p>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-1 space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-20 animate-pulse bg-lol-panel border border-lol-border rounded-lg" />
+            ))}
+          </div>
+          <div className="xl:col-span-2">
+            <div className="h-64 animate-pulse bg-lol-panel border border-lol-border rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }

@@ -8,7 +8,9 @@ import {
   Body,
   Query,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { PlayerService } from './player.service';
 import { CreatePlayerDto, UpdatePlayerDto } from './player.dto';
 
@@ -16,7 +18,9 @@ import { CreatePlayerDto, UpdatePlayerDto } from './player.dto';
 export class PlayerController {
   constructor(private readonly playerService: PlayerService) {}
 
-  // GET /api/players - Lấy tất cả tuyển thủ (có thể lọc theo teamId)
+  // GET /api/players - Lấy tất cả tuyển thủ (cache 5 phút)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(5 * 60 * 1000)
   @Get()
   findAll(@Query('teamId') teamId?: string) {
     if (teamId) {
@@ -25,7 +29,9 @@ export class PlayerController {
     return this.playerService.findAll();
   }
 
-  // GET /api/players/:id - Lấy thông tin 1 tuyển thủ
+  // GET /api/players/:id - Lấy thông tin 1 tuyển thủ (cache 5 phút)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(5 * 60 * 1000)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.playerService.findOne(id);

@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { teamApi, playerApi, seedApi, tournamentApi } from '@/lib/api';
 import { Team, Player, Tournament } from '@/types';
+import { useToast } from '@/components/Toast';
+import { StatCardSkeleton, TeamRowSkeleton, SkeletonLine } from '@/components/SkeletonLoader';
 
 // Dữ liệu tin tức giả
 const mockNews = [
@@ -23,7 +25,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
-  const [seedMsg, setSeedMsg] = useState('');
+  const { showToast } = useToast();
 
   // useEffect chạy 1 lần khi component mount để fetch dữ liệu
   useEffect(() => {
@@ -42,6 +44,7 @@ export default function DashboardPage() {
       setTeams(teamsData);
       setPlayers(playersData);
       setTournaments(toursData);
+      setError(null);
     } catch (err) {
       setError('Không thể kết nối đến server. Đảm bảo backend đang chạy tại port 3001.');
       console.error(err);
@@ -53,14 +56,13 @@ export default function DashboardPage() {
   // Hàm gọi API seed để tạo dữ liệu mẫu
   async function handleSeed() {
     setSeeding(true);
-    setSeedMsg('');
     try {
       const result = await seedApi.run();
-      setSeedMsg(result.message);
+      showToast(result.message, 'success');
       // Reload data sau khi seed
       await loadData();
     } catch (err) {
-      setSeedMsg('Lỗi khi tạo dữ liệu mẫu. Kiểm tra kết nối backend.');
+      showToast('Lỗi khi tạo dữ liệu mẫu. Kiểm tra kết nối backend.', 'error');
     } finally {
       setSeeding(false);
     }
@@ -104,15 +106,36 @@ export default function DashboardPage() {
           >
             {seeding ? '⏳ Đang tạo...' : '🌱 Tạo Dữ Liệu Mẫu'}
           </button>
-          {seedMsg && <p className="mt-2 text-green-400 text-sm">{seedMsg}</p>}
         </div>
       )}
 
-      {/* ===== LOADING ===== */}
+      {/* ===== LOADING SKELETONS ===== */}
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-lol-gold text-xl animate-pulse">⚡ Đang tải dữ liệu...</div>
-        </div>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {[1, 2, 3, 4].map((i) => <StatCardSkeleton key={i} />)}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-lol-panel border border-lol-border rounded-lg">
+                <div className="px-4 py-3 border-b border-lol-border">
+                  <SkeletonLine className="h-5 w-32" />
+                </div>
+                <div className="p-4 space-y-3">
+                  {[1, 2, 3].map((i) => <TeamRowSkeleton key={i} />)}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-lol-panel border border-lol-border rounded-lg p-4 space-y-3">
+                  <SkeletonLine className="h-5 w-28" />
+                  {[1, 2, 3].map((j) => <SkeletonLine key={j} className="h-4 w-full" />)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
       {!loading && !error && (

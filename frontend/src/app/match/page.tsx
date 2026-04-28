@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { teamApi, matchApi } from '@/lib/api';
 import { Team, Match, GameLog, MatchEvent, MatchFormat } from '@/types';
+import { useToast } from '@/components/Toast';
 
 const formatOptions: { value: MatchFormat; label: string; desc: string }[] = [
   { value: 'bo1', label: 'Bo1', desc: 'Trận đấu đơn' },
@@ -38,6 +39,7 @@ export default function MatchPage() {
   // Lịch sử trận đấu
   const [history, setHistory] = useState<Match[]>([]);
   const [selectedHistoryMatch, setSelectedHistoryMatch] = useState<Match | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     Promise.all([teamApi.getAll(), matchApi.getAll()])
@@ -69,9 +71,12 @@ export default function MatchPage() {
       setResult(match);
       // Cập nhật lịch sử
       setHistory((prev) => [match, ...prev]);
+      const winner = match.winnerId === match.team1Id ? match.team1.name : match.team2.name;
+      showToast(`🏆 ${winner} giành chiến thắng!`, 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi không xác định';
       setSimError(`Lỗi khi mô phỏng trận đấu: ${msg}`);
+      showToast('Lỗi mô phỏng trận đấu', 'error');
     } finally {
       setSimulating(false);
     }
@@ -81,8 +86,25 @@ export default function MatchPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-32">
-        <div className="text-lol-gold text-xl animate-pulse">⚡ Đang tải dữ liệu...</div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-lol-gold mb-1">🎮 Mô Phỏng Trận Đấu</h1>
+          <p className="text-gray-400">Chọn hai đội và bắt đầu mô phỏng 5v5 — Phase 2 Match Engine</p>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2">
+            <div className="bg-lol-panel border border-lol-border rounded-lg p-5 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-10 animate-pulse bg-lol-border/50 rounded-md" />
+              ))}
+            </div>
+          </div>
+          <div className="bg-lol-panel border border-lol-border rounded-lg p-4 space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-16 animate-pulse bg-lol-border/50 rounded-lg" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

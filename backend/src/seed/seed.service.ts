@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Champion, DamageType, ChampionRole, SynergyTag } from '../champion/champion.entity';
 import { Player, PlayerRole } from '../player/player.entity';
 import { Item } from '../item/item.entity';
@@ -15,6 +17,7 @@ export class SeedService {
     @InjectRepository(Player) private playerRepo: Repository<Player>,
     @InjectRepository(Item) private itemRepo: Repository<Item>,
     @InjectRepository(Team) private teamRepo: Repository<Team>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // POST /api/seed - Gọi endpoint này để tạo dữ liệu mẫu vào database
@@ -42,6 +45,8 @@ export class SeedService {
     await this.seedItems();
 
     this.logger.log('✅ Seed dữ liệu thành công!');
+    // Xóa toàn bộ cache để đảm bảo dữ liệu mới được phản ánh ngay
+    await this.cacheManager.reset();
     return { message: 'Tạo dữ liệu mẫu thành công!' };
   }
 

@@ -2,9 +2,12 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull, Not } from 'typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Player } from '../player/player.entity';
 import { Team } from '../team/team.entity';
 import { TransferOffer } from './transfer-offer.entity';
@@ -25,6 +28,7 @@ export class TransferService {
     private teamRepo: Repository<Team>,
     @InjectRepository(TransferOffer)
     private offerRepo: Repository<TransferOffer>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // ===== MARKET DATA =====
@@ -61,7 +65,9 @@ export class TransferService {
     }
     player.isTransferListed = true;
     player.transferFee = dto.transferFee;
-    return this.playerRepo.save(player);
+    const saved = await this.playerRepo.save(player);
+    await this.cacheManager.reset();
+    return saved;
   }
 
   // Gỡ tuyển thủ khỏi danh sách rao bán
@@ -74,7 +80,9 @@ export class TransferService {
     }
     player.isTransferListed = false;
     player.transferFee = 0;
-    return this.playerRepo.save(player);
+    const saved = await this.playerRepo.save(player);
+    await this.cacheManager.reset();
+    return saved;
   }
 
   // ===== SIGN / RELEASE =====
@@ -102,7 +110,9 @@ export class TransferService {
     team.totalSalary = Number(team.totalSalary) + player.salary;
 
     await this.teamRepo.save(team);
-    return this.playerRepo.save(player);
+    const saved = await this.playerRepo.save(player);
+    await this.cacheManager.reset();
+    return saved;
   }
 
   // Thả tuyển thủ ra thị trường tự do
@@ -126,7 +136,9 @@ export class TransferService {
     player.teamId = null;
     player.isTransferListed = false;
     player.transferFee = 0;
-    return this.playerRepo.save(player);
+    const saved = await this.playerRepo.save(player);
+    await this.cacheManager.reset();
+    return saved;
   }
 
   // ===== OFFERS =====
@@ -245,7 +257,9 @@ export class TransferService {
     }
 
     offer.status = 'accepted';
-    return this.offerRepo.save(offer);
+    const result = await this.offerRepo.save(offer);
+    await this.cacheManager.reset();
+    return result;
   }
 
   // Từ chối đề nghị mua

@@ -43,8 +43,26 @@ export default function ItemsPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-lol-gold animate-pulse">⚡ Đang tải trang bị...</div>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="bg-lol-panel border border-lol-border rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded animate-pulse bg-lol-border/50" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-3/4 animate-pulse bg-lol-border/50 rounded" />
+                  <div className="h-3 w-1/2 animate-pulse bg-lol-border/50 rounded" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="flex justify-between">
+                    <div className="h-3 w-16 animate-pulse bg-lol-border/50 rounded" />
+                    <div className="h-3 w-8 animate-pulse bg-lol-border/50 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <>

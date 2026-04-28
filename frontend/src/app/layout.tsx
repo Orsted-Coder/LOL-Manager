@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import { ToastProvider } from '@/components/Toast';
 
 export const metadata: Metadata = {
   title: 'LOL Manager - Quản lý đội tuyển LMHT',
@@ -17,12 +18,14 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="min-h-screen bg-lol-dark text-lol-gold-light">
-        {/* Navbar cố định phía trên */}
-        <Navbar />
-        {/* Nội dung chính - có padding-top để không bị Navbar che */}
-        <main className="pt-16 min-h-screen">
-          {children}
-        </main>
+        <ToastProvider>
+          {/* Navbar cố định phía trên */}
+          <Navbar />
+          {/* Nội dung chính - có padding-top để không bị Navbar che */}
+          <main className="pt-16 min-h-screen">
+            {children}
+          </main>
+        </ToastProvider>
       </body>
     </html>
   );
